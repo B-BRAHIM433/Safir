@@ -11,8 +11,7 @@ Column rowItems(Function? fun(), IconData icon, String title, Color color) {
       Expanded(
         child: Container(
             margin: const EdgeInsets.only(bottom: 15),
-            // height: 70,
-            // width: 70,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               color: color,
@@ -64,7 +63,6 @@ class _HomeState extends State<Home> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            
             const Expanded(
               child: Text(
                 "Welcome ",
@@ -75,7 +73,6 @@ class _HomeState extends State<Home> {
                     fontWeight: FontWeight.bold),
               ),
             ),
-            
             Expanded(
               child: Form(
                   child: TextFormField(
@@ -84,8 +81,8 @@ class _HomeState extends State<Home> {
                     borderRadius: BorderRadius.all(Radius.circular(40)),
                   ),
                   hintText: 'Search...',
-                  hintStyle:
-                      const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  hintStyle: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 18),
                   prefixIcon: const Icon(Icons.search_rounded),
                   prefixIconColor: Colors.orangeAccent,
                   filled: true,
@@ -93,9 +90,7 @@ class _HomeState extends State<Home> {
                 ),
               )),
             ),
-            
             Expanded(
-              // height: double.infinity,
               child: ListView(scrollDirection: Axis.horizontal, children: [
                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
