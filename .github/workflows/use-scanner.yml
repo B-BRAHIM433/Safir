@@ -1,0 +1,14 @@
+# .github/workflows/use-scanner.yml dans le repo de ton app
+name: Scanner de sécurité centralisé
+
+on:
+  push:
+    branches: [ main ]  # ou autre branche que tu veux surveiller
+
+jobs:
+  call-scanner:
+    uses: ton-org/security-automation/.github/workflows/scan.yml@main
+    with:
+      docker_image: "ton-image:latest"  # ou vide si tu ne veux que le code
+    secrets:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
