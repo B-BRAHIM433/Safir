@@ -7,8 +7,8 @@ on:
 
 jobs:
   call-scanner:
-    uses: ton-org/security-automation/.github/workflows/scan.yml@main
+    uses: B-BRAHIM433/Stage_DevSecOps/.github/workflows/scan_app.yml@main
     with:
-      docker_image: "ton-image:latest"  # ou vide si tu ne veux que le code
+      docker_image: ""  # ou vide si tu ne veux que le code
     secrets:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
