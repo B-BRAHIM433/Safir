@@ -7,7 +7,7 @@ on:
 
 jobs:
   call-scanner:
-    uses: B-BRAHIM433/Stage_DevSecOps/.github/workflows/scan_app.yml@main
+    uses: B-BRAHIM433/Stage_DevSecOps/.github/workflows/scan_app.yml@master
     with:
       docker_image: ""  # ou vide si tu ne veux que le code
     secrets:
