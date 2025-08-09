@@ -3,7 +3,7 @@ name: Scanner de sécurité centralisé
 
 on:
   push:
-    branches: [ master ]  # ou autre branche que tu veux surveiller
+    branches: [ master, main ]  # ou autre branche que tu veux surveiller
 
 jobs:
   call-scanner:
