@@ -1,14 +1,76 @@
-# .github/workflows/use-scanner.yml dans le repo de ton app
-name: Scanner de sécurité centralisé
+name: Security Scan
 
 on:
-  push:
-    branches: [ master, main ]  # ou autre branche que tu veux surveiller
+  workflow_dispatch:
+    inputs:
+      target_repo:
+        description: "URL du repo à scanner"
+        required: true
+      scan_id:
+        description: "ID du scan"
+        required: false
+      callback_url:
+        description: "URL du backend pour envoyer les résultats"
+        required: true
 
 jobs:
-  call-scanner:
-    uses: B-BRAHIM433/Stage_DevSecOps/.github/workflows/scan_app.yml@master
-    with:
-      docker_image: ""  # ou vide si tu ne veux que le code
-    secrets:
-      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+  security-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout du repo cible
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.inputs.target_repo }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 2. Setup Node.js (utile pour Snyk et projets JS)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # 3. Scan avec Trivy
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          scan-type: fs
+          ignore-unfixed: true
+          format: json
+          output: trivy-results.json
+
+      # 4. Scan avec Snyk (si token dispo)
+      - name: Run Snyk
+        if: secrets.SNYK_TOKEN != ''
+        run: |
+          npm install -g snyk
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+          snyk test --json > snyk-results.json
+
+      # 5. Fusionner résultats (simple concat JSON)
+      - name: Merge results
+        run: |
+          echo '{ "scan_id": "${{ github.event.inputs.scan_id }}", "repository": "${{ github.event.inputs.target_repo }}", "results": {' > results.json
+          echo '"trivy":' >> results.json
+          cat trivy-results.json >> results.json
+          if [ -f snyk-results.json ]; then
+            echo ', "snyk":' >> results.json
+            cat snyk-results.json >> results.json
+          fi
+          echo '}}' >> results.json
+
+      # 6. Upload des résultats comme artefact
+      - name: Upload results artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-scan-results
+          path: results.json
+
+      # 7. Callback vers ton backend (ngrok ou domaine fixe)
+      - name: Send results to backend
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d @results.json \
+            "${{ github.event.inputs.callback_url }}"
